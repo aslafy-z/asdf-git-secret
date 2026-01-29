@@ -1,0 +1,9 @@
+# asdf plugin development
+.idea/
+*.iml
+.vscode/
+
+# Testing
+test/
+tmp/
+*.log

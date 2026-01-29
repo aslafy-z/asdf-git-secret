@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+# List all available versions from git-secret GitHub releases
+git ls-remote --tags --refs https://github.com/sobolevn/git-secret.git \
+  | grep -o 'refs/tags/.*' \
+  | cut -d/ -f3- \
+  | sed 's/^v//' \
+  | sort -V

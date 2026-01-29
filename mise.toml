@@ -1,0 +1,24 @@
+[tools]
+shellcheck = "latest"
+shfmt = "latest"
+
+[tasks.lint]
+description = "Run linting checks (shellcheck and shfmt)"
+run = [
+  "shellcheck -e SC1091 bin/*",
+  "shellcheck -e SC1091 lib/*.bash",
+  "shfmt -d -i 2 -bn -ci -sr bin lib setup.sh"
+]
+
+[tasks."lint:fix"]
+description = "Fix formatting issues with shfmt"
+run = "shfmt -w -i 2 -bn -ci -sr bin lib setup.sh"
+
+[tasks.test]
+description = "Test plugin scripts for syntax errors"
+run = [
+  "bash -n bin/download",
+  "bash -n bin/install",
+  "bash -n bin/list-all",
+  "bash -n lib/utils.bash"
+]
