@@ -1,0 +1,60 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  plugin_test:
+    name: asdf plugin test
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: asdf_plugin_test
+        uses: asdf-vm/actions/plugin-test@v3
+        with:
+          command: git-secret --version
+        env:
+          GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  test_install:
+    name: Test installation on ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        version: ["0.5.0", "0.4.0"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install dependencies (Ubuntu)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y gnupg gawk make
+
+      - name: Install dependencies (macOS)
+        if: runner.os == 'macOS'
+        run: brew install gnupg gawk
+
+      - name: Install asdf
+        uses: asdf-vm/actions/setup@v3
+
+      - name: Install plugin
+        run: asdf plugin add git-secret ${{ github.workspace }}
+
+      - name: Install git-secret ${{ matrix.version }}
+        run: asdf install git-secret ${{ matrix.version }}
+
+      - name: Set git-secret version
+        run: asdf global git-secret ${{ matrix.version }}
+
+      - name: Verify installation
+        run: |
+          git-secret --version
+          which git-secret
